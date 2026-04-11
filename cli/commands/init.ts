@@ -110,7 +110,7 @@ export function getGeneratorOptions(
 
         return {
           getContext: (id) => bitmap.getContext(id),
-          getPng: () => png.encode(bitmap.data, bitmap.width, bitmap.height),
+          getPng: () => png.encode(bitmap.data, bitmap.width, bitmap.height).buffer,
           measureText(ctx: pureimage.Context, text) {
             const font = fontLoader.font;
             const fontSize = ctx._font.size!;
