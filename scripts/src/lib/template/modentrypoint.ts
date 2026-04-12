@@ -1,12 +1,11 @@
-import { renderTemplate } from "./eta";
 import type { ComputedConfiguration, TemplateWriter } from "./template";
 
-import javaEntrypointTemplate from './templates/entrypoint/Entrypoint.java.eta?raw';
-import kotlinEntrypointTemplate from './templates/entrypoint/Entrypoint.kt.eta?raw';
-import javaEntrypointClientTemplate from './templates/entrypoint/ClientEntrypoint.java.eta?raw';
-import kotlinEntrypointClientTemplate from './templates/entrypoint/ClientEntrypoint.kt.eta?raw';
-import javaEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.java.eta?raw';
-import kotlinEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.kt.eta?raw';
+import javaEntrypointTemplate from './templates/entrypoint/Entrypoint.java.eta';
+import kotlinEntrypointTemplate from './templates/entrypoint/Entrypoint.kt.eta';
+import javaEntrypointClientTemplate from './templates/entrypoint/ClientEntrypoint.java.eta';
+import kotlinEntrypointClientTemplate from './templates/entrypoint/ClientEntrypoint.kt.eta';
+import javaEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.java.eta';
+import kotlinEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.kt.eta';
 import { minecraftSupportsSlf4j } from "./minecraft";
 
 interface ClassOptions {
@@ -61,10 +60,10 @@ async function generateJavaEntrypoint(writer: TemplateWriter, options: ClassOpti
         ]
     };
 
-    await writer.write(`src/main/java/${options.path}.java`, renderTemplate(javaEntrypointTemplate, options))
+    await writer.write(`src/main/java/${options.path}.java`, javaEntrypointTemplate(options))
 
     if (options.clientEntrypoint) {
-        await writer.write(`src/client/java/${options.clientPath}Client.java`, renderTemplate(javaEntrypointClientTemplate, {
+        await writer.write(`src/client/java/${options.clientPath}Client.java`, javaEntrypointClientTemplate({
             ...options,
             className: options.className + "Client",
             package: options.clientPackage
@@ -83,7 +82,7 @@ async function generateJavaEntrypoint(writer: TemplateWriter, options: ClassOpti
         const path = options.clientEntrypoint ? options.clientPath : options.path;
         const fullName = options.clientEntrypoint ? options.clientClassFullName : options.classFullName;
 
-        await writer.write(`src/${sourceSet}/java/${path}DataGenerator.java`, renderTemplate(javaEntrypointDataGeneratorTemplate, {
+        await writer.write(`src/${sourceSet}/java/${path}DataGenerator.java`, javaEntrypointDataGeneratorTemplate({
             ...options,
             className: options.className + "DataGenerator",
             package: options.clientEntrypoint ? options.clientPackage : options.package
@@ -110,10 +109,10 @@ async function generateKotlinEntrypoint(writer: TemplateWriter, options: ClassOp
         ]
     };
 
-    await writer.write(`src/main/kotlin/${options.path}.kt`, renderTemplate(kotlinEntrypointTemplate, options))
+    await writer.write(`src/main/kotlin/${options.path}.kt`, kotlinEntrypointTemplate(options))
 
     if (options.clientEntrypoint) {
-        await writer.write(`src/client/kotlin/${options.clientPath}Client.kt`, renderTemplate(kotlinEntrypointClientTemplate, {
+        await writer.write(`src/client/kotlin/${options.clientPath}Client.kt`, kotlinEntrypointClientTemplate({
             ...options,
             className: options.className + "Client",
             package: options.clientPackage
@@ -135,7 +134,7 @@ async function generateKotlinEntrypoint(writer: TemplateWriter, options: ClassOp
         const path = options.clientEntrypoint ? options.clientPath : options.path;
         const fullName = options.clientEntrypoint ? options.clientClassFullName : options.classFullName;
 
-        await writer.write(`src/${sourceSet}/kotlin/${path}DataGenerator.kt`, renderTemplate(kotlinEntrypointDataGeneratorTemplate, {
+        await writer.write(`src/${sourceSet}/kotlin/${path}DataGenerator.kt`, kotlinEntrypointDataGeneratorTemplate({
             ...options,
             className: options.className + "DataGenerator",
             package: options.clientEntrypoint ? options.clientPackage : options.package

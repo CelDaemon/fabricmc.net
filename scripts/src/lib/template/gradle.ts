@@ -3,10 +3,11 @@ import { renderTemplate } from './eta';
 import { addGroovyGradle } from './gradlegroovy';
 import { addKotlinGradle } from './gradlekotlin';
 
-import gradlePropertiesTemplate from './templates/gradle/gradle.properties.eta?raw';
+import gradlePropertiesTemplate from './templates/gradle/gradle.properties.eta';
 
 export async function addGradle(writer: TemplateWriter, config: ComputedConfiguration) {
-	await writer.write('gradle.properties', renderTemplate(gradlePropertiesTemplate, config));
+    const out =  gradlePropertiesTemplate(config, {});
+	await writer.write('gradle.properties', out);
 	if (config.gradleKotlin) {
 		await addKotlinGradle(writer, config);
 	} else {

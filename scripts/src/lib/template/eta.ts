@@ -1,6 +1,6 @@
 import { Eta } from "eta"
 
-const eta = new Eta({
+export const eta = new Eta({
 	autoTrim: false
 })
 
