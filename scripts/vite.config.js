@@ -5,7 +5,7 @@ import { eta } from './src/lib/template/eta';
 
 const buildLib = process.env.BUILD_LIB;
 
-const eta = {
+const etaPlugin = {
     name: 'eta',
     transform: {
         handler(src, id) {
@@ -24,7 +24,7 @@ const eta = {
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => buildLib ? ({
   // Library for CLI
-  plugins: [dts({ rollupTypes: true }), eta],
+  plugins: [dts({ rollupTypes: true }), etaPlugin],
   build: {
     sourcemap: false,
     minify: false,
@@ -39,7 +39,7 @@ export default defineConfig(({ mode }) => buildLib ? ({
   }
 }) : ({
   // Web build
-  plugins: [svelte(), eta],
+  plugins: [svelte(), etaPlugin],
   build: {
     sourcemap: mode === "development",
     // Build directly into the Jekyll output directory
