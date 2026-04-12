@@ -1,22 +1,17 @@
 import { defineConfig } from 'vite'
 import { svelte } from '@sveltejs/vite-plugin-svelte'
 import dts from 'vite-plugin-dts'
-import { eta as etaCompiler } from './src/lib/template/eta';
+import { eta } from './src/lib/template/eta';
 
 const buildLib = process.env.BUILD_LIB;
-
-const etaMatch = /\.(eta)$/
 
 const eta = {
     name: 'eta',
     transform: {
-        filter: {
-            id: etaMatch
-        },
         handler(src, id) {
-            if(!etaMatch.test(id))
+            if(!/\.(eta)$/.test(id))
                 return;
-            const compiled = etaCompiler.compileToString(src)
+            const compiled = eta.compileToString(src)
             const code = `import { eta } from '/src/lib/template/eta.ts';function template(it, options){${compiled}};const bound = template.bind(eta);export default bound;`
             return {
                 code,
