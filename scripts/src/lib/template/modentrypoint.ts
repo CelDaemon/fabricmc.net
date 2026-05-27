@@ -47,11 +47,41 @@ export async function generateEntrypoint(writer: TemplateWriter, options: Comput
     }
 }
 
+const NUMERALS = [
+    'zero',
+    'one',
+    'two',
+    'three',
+    'four',
+    'five',
+    'six',
+    'seven',
+    'eight',
+    'nine'
+] as const;
+
+function replaceNumerals(s: string): string[] | string {
+    const match = s.match(/^\d+/);
+    if(!(match && match[0]))
+        return s;
+    const numericPrefix = match[0];
+    const rest = s.substring(numericPrefix.length);
+    const out: string[] = numericPrefix.split('').map(x => NUMERALS[parseInt(x)]);
+    if(rest)
+        out.push(rest);
+    return out;
+}
+
 function formatClassname(projectName: string): string {
     return projectName.split(' ')
+        .map(s => s?.replaceAll(/\W/g, ""))
+        .filter(s => s)
+        .flatMap((s, i) => {
+            if(i !== 0) return s;
+            return replaceNumerals(s);
+        })
         .map(s => s[0].toUpperCase() + s.slice(1))
         .join("")
-        .replace(/\W+/g, "");
 }
 
 async function generateJavaEntrypoint(writer: TemplateWriter, options: ClassOptions): Promise<unknown> {
