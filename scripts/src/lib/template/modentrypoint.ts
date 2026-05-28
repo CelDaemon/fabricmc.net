@@ -8,6 +8,7 @@ import kotlinEntrypointClientTemplate from './templates/entrypoint/ClientEntrypo
 import javaEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.java.eta?raw';
 import kotlinEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.kt.eta?raw';
 import { minecraftSupportsSlf4j } from "./minecraft";
+import { replaceNumerals } from "./java";
 
 interface ClassOptions {
     package: string, // com.example
@@ -47,30 +48,6 @@ export async function generateEntrypoint(writer: TemplateWriter, options: Comput
     }
 }
 
-const NUMERALS = [
-    'zero',
-    'one',
-    'two',
-    'three',
-    'four',
-    'five',
-    'six',
-    'seven',
-    'eight',
-    'nine'
-] as const;
-
-function replaceNumerals(s: string): string[] | string {
-    const match = s.match(/^\d+/);
-    if(!(match && match[0]))
-        return s;
-    const numericPrefix = match[0];
-    const rest = s.substring(numericPrefix.length);
-    const out: string[] = numericPrefix.split('').map(x => NUMERALS[parseInt(x)]);
-    if(rest)
-        out.push(rest);
-    return out;
-}
 
 function formatClassname(projectName: string): string {
     return projectName.split(' ')
