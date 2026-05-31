@@ -97,6 +97,23 @@ export function computePackageNameErrors(packageName: string): string[] {
 	return errorList;
 }
 
+function capitalize(s: string): string {
+    return s[0].toUpperCase() + s.slice(1);
+}
+
+function toPascalCase(parts: string[]): string {
+    return parts
+        .filter(s => s)
+        .map(capitalize)
+        .join('');
+}
+
+export function formatClassname(projectName: string): string {
+    const s = toPascalCase(projectName.split(/\b/).map(s => s.replaceAll(/\W/g, '')));
+    const [numerals, rest] = convertNumericPrefix(s);
+    return `${toPascalCase(numerals)}${capitalize(rest)}`;
+}
+
 export function formatPackageName(packageName: string): string {
     return packageName
         .toLocaleLowerCase()
@@ -105,7 +122,9 @@ export function formatPackageName(packageName: string): string {
 }
 
 export function generatePackageName(packageName: string): string | undefined {
-    const formatted = replaceNumerals(formatPackageName(packageName)).join('');
+    const [numerals, rest] = convertNumericPrefix(formatPackageName(packageName));
+
+    const formatted = `${numerals.join('')}${rest}`;
 
     if(computePackageNameErrors(formatted).length !== 0)
         return;
@@ -126,14 +145,11 @@ const NUMERALS = [
     'nine'
 ] as const;
 
-export function replaceNumerals(s: string): string[] {
+export function convertNumericPrefix(s: string): [string[], string] {
     const match = s.match(/^\d+/);
     if(!(match && match[0]))
-        return [s];
+        return [[], s];
     const numericPrefix = match[0];
     const rest = s.substring(numericPrefix.length);
-    const out: string[] = numericPrefix.split('').map(x => NUMERALS[parseInt(x)]);
-    if(rest)
-        out.push(rest);
-    return out;
+    return [numericPrefix.split('').map(x => NUMERALS[parseInt(x)]), rest];
 }
