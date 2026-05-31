@@ -116,9 +116,9 @@ export function formatClassname(projectName: string): string {
 
 export function formatPackageName(packageName: string): string {
     return packageName
-        .toLocaleLowerCase()
+        .toLowerCase()
         .replaceAll(/\s+/g, '.')
-        .replaceAll(/[^a-za-z0-9_\.]/g, "");
+        .replaceAll(/[^a-z0-9_\.]/g, "");
 }
 
 export function generatePackageName(packageName: string): string | undefined {
