@@ -7,8 +7,18 @@ import javaEntrypointClientTemplate from './templates/entrypoint/ClientEntrypoin
 import kotlinEntrypointClientTemplate from './templates/entrypoint/ClientEntrypoint.kt.eta?raw';
 import javaEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.java.eta?raw';
 import kotlinEntrypointDataGeneratorTemplate from './templates/entrypoint/DataGeneratorEntrypoint.kt.eta?raw';
-import { minecraftSupportsSlf4j } from "./minecraft";
+import { getMajorMinecraftVersion, getMinorMinecraftVersion, getPatchMinecraftVersion, minecraftSupportsSlf4j } from "./minecraft";
 import { formatClassname } from "./java";
+
+interface IdentifierNames {
+    package: string, // net.minecraft.resources
+    class: string, // Identifier
+    factoryName: string // fromNamespaceAndPath,
+}
+
+interface IdentifierOptions extends IdentifierNames {
+    factory: string // Identifier.fromNamespaceAndPath / new ResourceLocation
+}
 
 interface ClassOptions {
     package: string, // com.example
@@ -22,6 +32,49 @@ interface ClassOptions {
     slf4j: boolean,
     clientEntrypoint: boolean,
     dataEntrypoint: boolean,
+    identifier: IdentifierOptions
+}
+
+function getIdentifierFactory(names: IdentifierNames, version: string): string {
+    const major = getMajorMinecraftVersion(version);
+    const minor = getMinorMinecraftVersion(version);
+
+    if(major > 1 || minor > 20)
+        return `${names.class}.${names.factoryName}`;
+
+    return `new ${names.class}`;
+}
+
+function getIdentifierNames(options: ComputedConfiguration): IdentifierNames {
+    const isYarn = !(options.unobfuscated || options.mojmap);
+    if(isYarn) {
+        return {
+            package: 'net.minecraft.util',
+            class: 'Identifier',
+            factoryName: 'of'
+        };
+    }
+    const major = getMajorMinecraftVersion(options.minecraftVersion);
+    const minor = getMinorMinecraftVersion(options.minecraftVersion);
+    const patch = getPatchMinecraftVersion(options.minecraftVersion);
+
+    const clazz = (major > 1 || (minor == 21 && patch == 11)) ? 'Identifier' : 'ResourceLocation';
+
+    return {
+        package: 'net.minecraft.resources',
+        class: clazz,
+        factoryName: 'fromNamespaceAndPath'
+    };
+}
+
+function buildIdentifierOptions(options: ComputedConfiguration): IdentifierOptions {
+    const names = getIdentifierNames(options);
+    const factory = getIdentifierFactory(names, options.minecraftVersion);
+
+    return {
+        ...names,
+        factory
+    };
 }
 
 export async function generateEntrypoint(writer: TemplateWriter, options: ComputedConfiguration): Promise<unknown> {
@@ -38,7 +91,8 @@ export async function generateEntrypoint(writer: TemplateWriter, options: Comput
         modid: options.modid,
         slf4j: minecraftSupportsSlf4j(options.minecraftVersion),
         clientEntrypoint: options.splitSources,
-        dataEntrypoint: options.dataGeneration
+        dataEntrypoint: options.dataGeneration,
+        identifier: buildIdentifierOptions(options)
     }
 
     if (options.kotlin) {
