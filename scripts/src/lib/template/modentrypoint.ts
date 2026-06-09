@@ -13,7 +13,7 @@ import { formatClassname } from "./java";
 interface IdentifierNames {
     package: string, // net.minecraft.resources
     class: string, // Identifier
-    factoryName: string // fromNamespaceAndPath,
+    factoryName: string // fromNamespaceAndPath
 }
 
 interface IdentifierOptions extends IdentifierNames {
@@ -46,8 +46,7 @@ function getIdentifierFactory(names: IdentifierNames, version: string): string {
 }
 
 function getIdentifierNames(options: ComputedConfiguration): IdentifierNames {
-    const isYarn = !(options.unobfuscated || options.mojmap);
-    if(isYarn) {
+    if(!(options.unobfuscated || options.mojmap)) {
         return {
             package: 'net.minecraft.util',
             class: 'Identifier',
