@@ -7,13 +7,13 @@ import <%= it.identifier.package %>.<%= it.identifier.class %>
 object <%= it.className %> : ModInitializer {
 	const val MOD_ID: String = "<%= it.modid %>"
 
-<% if (it.slf4j) { %>    private val logger = LoggerFactory.getLogger("<%= it.modid %>")
-<% } else { %>    private val logger = LogManager.getLogger("<%= it.modid %>")<% } %>
+<% if (it.slf4j) { %>    private val LOGGER = LoggerFactory.getLogger("<%= it.modid %>")
+<% } else { %>    private val LOGGER = LogManager.getLogger("<%= it.modid %>")<% } %>
 	override fun onInitialize() {
 		// This code runs as soon as Minecraft is in a mod-load-ready state.
 		// However, some things (like resources) may still be uninitialized.
 		// Proceed with mild caution.
-		logger.info("Hello Fabric world!")
+		LOGGER.info("Hello Fabric world!")
 	}
 
 	fun id(path: String): <%= it.identifier.class %>
